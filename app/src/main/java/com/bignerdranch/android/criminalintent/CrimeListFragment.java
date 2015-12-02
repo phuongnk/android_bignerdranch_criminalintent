@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -32,6 +33,15 @@ public class CrimeListFragment extends Fragment
             mCrimeTitleTextView = (TextView)pItemView.findViewById(R.id.list_item_crime_title_textview);
             mCrimeDateTextView = (TextView)pItemView.findViewById(R.id.list_item_crime_date_textview);
             mCrimeSolvedCheckbox = (CheckBox)pItemView.findViewById(R.id.list_item_crime_solved_checkbox);
+
+            //add an OnClickListener to the itemView
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TextView crimeTitleTextView = (TextView)v.findViewById(R.id.list_item_crime_title_textview);
+                    Toast.makeText(getActivity(), crimeTitleTextView.getText() + " pressed", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
