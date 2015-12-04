@@ -1,10 +1,12 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +22,17 @@ import java.util.List;
  */
 public class CrimeListFragment extends Fragment
 {
+    public static String CRIME_ID_KEY = "com.bignerdranch.android.criminalintent.crime_id";
+
     private RecyclerView mCrimeRecyclerView;
 
-    private class CrimeHolder extends RecyclerView.ViewHolder {
+    // The item ViewHolder for the RecyclerView
+    // This ViewHolder is also it's itemView's OnClickListener
+    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView mCrimeTitleTextView;
         public TextView mCrimeDateTextView;
         public CheckBox mCrimeSolvedCheckbox;
+        public Crime mCrime;
 
         public CrimeHolder(View pItemView)
         {
@@ -35,16 +42,24 @@ public class CrimeListFragment extends Fragment
             mCrimeSolvedCheckbox = (CheckBox)pItemView.findViewById(R.id.list_item_crime_solved_checkbox);
 
             //add an OnClickListener to the itemView
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TextView crimeTitleTextView = (TextView)v.findViewById(R.id.list_item_crime_title_textview);
-                    Toast.makeText(getActivity(), crimeTitleTextView.getText() + " pressed", Toast.LENGTH_SHORT).show();
-                }
-            });
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d(CrimeFragment.LOG_TAG, "onClick begins");
+
+
+            //Toast.makeText(getActivity(), mCrimeTitleTextView.getText() + " pressed", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getActivity(), CrimeActivity.class);
+            intent.putExtra(CRIME_ID_KEY, mCrime.getId());
+
+            Log.d(CrimeFragment.LOG_TAG, "starting activity....................");
+            startActivity(intent);
         }
     }
 
+    // The adapter for the RecyclerView
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
         private List<Crime> mCrimes; // the underlying data elements
 
@@ -66,6 +81,7 @@ public class CrimeListFragment extends Fragment
         public void onBindViewHolder(CrimeHolder pItemViewHolder, int pDataPosition) {
             // get the data element
             Crime crime = mCrimes.get(pDataPosition);
+            pItemViewHolder.mCrime = crime;
             // update the item View components according to the data contents
             pItemViewHolder.mCrimeTitleTextView.setText(crime.getTitle());
             pItemViewHolder.mCrimeDateTextView.setText(crime.getDate().toString());
