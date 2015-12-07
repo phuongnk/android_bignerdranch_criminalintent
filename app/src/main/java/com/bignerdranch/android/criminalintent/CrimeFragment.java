@@ -22,12 +22,22 @@ import java.util.UUID;
  * Created by Owner on 11/19/2015.
  */
 public class CrimeFragment extends Fragment {
-    public static String LOG_TAG = "CriminalIntent";
+    //public static String LOG_TAG = "CriminalIntent";
+    public static String ARG_CRIME_ID = "crime_id";
 
     private Crime mCrime;
     private EditText mCrimeTitleField;
     private Button mCrimeDateButton;
     private CheckBox mCrimeSolvedCheckbox;
+
+    public static CrimeFragment newInstance(UUID crimeId) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_CRIME_ID, crimeId);
+
+        CrimeFragment fragment = new CrimeFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,38 +48,26 @@ public class CrimeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(LOG_TAG, "onCreateView begins............");
+        Log.d(App.LOG_TAG, "onCreateView begins............");
         // Inflating the view.
         // The 3rd parameter is false because we don’t want to add the fragment’s view
         // to the activity’s yet. That will be done in a different code section
         View v = inflater.inflate(R.layout.fragment_crime, container, false);
 
-        Log.d(LOG_TAG, "onCreateView: wiring widgets............");
+        Log.d(App.LOG_TAG, "onCreateView: wiring widgets............");
         // Wiring (obtaining the handles to) the widget objects
         // You do this by calling findViewById() on the fragment’s view object
         mCrimeTitleField = (EditText)v.findViewById(R.id.fragcrime_crime_title_edittext);
         mCrimeDateButton = (Button)v.findViewById(R.id.fragcrime_crime_date_button);
         mCrimeSolvedCheckbox = (CheckBox) v.findViewById(R.id.fragcrime_crime_solved_checkbox);
 
-        Log.d(LOG_TAG, "onCreateView getting intent obj............");
-        Intent intent = getActivity().getIntent();
-        if (intent != null) {
-            UUID crimeId = (UUID) intent.getSerializableExtra(CrimeListFragment.CRIME_ID_KEY);
-            if (crimeId != null) {
-                mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
-                if (mCrime == null) {
-                    Log.d(LOG_TAG, "onCreateView: mCrime is null");
-                }
-            }
-            else {
-                Log.d(LOG_TAG, "onCreateView: crimeId is null");
-            }
-        }
-        else {
-            Log.d(LOG_TAG, "onCreateView: intent is null");
+        Log.d(App.LOG_TAG, "onCreateView: reading Fragment arguments............");
+        UUID crimeId = (UUID)getArguments().getSerializable(ARG_CRIME_ID);
+        if (crimeId != null) {
+            mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
         }
 
-        Log.d(LOG_TAG, "onCreateView: updating widgets............");
+        Log.d(App.LOG_TAG, "onCreateView: updating widgets............");
         // Manipulating the widget objects, such as setting labels text or adding listeners
         //java.text.DateFormat dateFormat = android.text.format.DateFormat.getLongDateFormat(getContext());
         //mCrimeDateButton.setText(dateFormat.format(mCrime.getDate()));
@@ -78,7 +76,7 @@ public class CrimeFragment extends Fragment {
         mCrimeDateButton.setEnabled(false);
         mCrimeTitleField.setText(mCrime.getTitle());
         mCrimeSolvedCheckbox.setChecked(mCrime.isSolved());
-        
+
         mCrimeSolvedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

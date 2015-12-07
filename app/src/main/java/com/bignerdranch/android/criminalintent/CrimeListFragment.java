@@ -25,6 +25,9 @@ public class CrimeListFragment extends Fragment
     public static String CRIME_ID_KEY = "com.bignerdranch.android.criminalintent.crime_id";
 
     private RecyclerView mCrimeRecyclerView;
+    private CrimeAdapter mCrimeAdapter;
+    private Crime mClickedCrime;
+
 
     // The item ViewHolder for the RecyclerView
     // This ViewHolder is also it's itemView's OnClickListener
@@ -47,14 +50,15 @@ public class CrimeListFragment extends Fragment
 
         @Override
         public void onClick(View v) {
-            Log.d(CrimeFragment.LOG_TAG, "onClick begins");
+            Log.d(App.LOG_TAG, "onClick begins");
 
 
             //Toast.makeText(getActivity(), mCrimeTitleTextView.getText() + " pressed", Toast.LENGTH_SHORT).show();
+            mClickedCrime = mCrime;
             Intent intent = new Intent(getActivity(), CrimeActivity.class);
             intent.putExtra(CRIME_ID_KEY, mCrime.getId());
 
-            Log.d(CrimeFragment.LOG_TAG, "starting activity....................");
+            Log.d(App.LOG_TAG, "starting activity....................");
             startActivity(intent);
         }
     }
@@ -115,14 +119,31 @@ public class CrimeListFragment extends Fragment
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //updateUI();
+        int position = CrimeLab.get(getActivity()).getCrimes().indexOf(mClickedCrime);
+        Log.d(App.LOG_TAG, "CrimeListFragment.onResume: data may have been changed in position: " + position);
+        mCrimeAdapter.notifyItemChanged(position);
+        Log.d(App.LOG_TAG, "CrimeListFragment.onResume: position " + position + " View widgets updated");
+    }
+
+    // set the RecyclerView's adapter if not done so
+    // refresh the data otherwise
     private void updateUI() {
         // retrieve the data elements
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimeList = crimeLab.getCrimes();
 
         // create an adapter that works on this dataset
-        CrimeAdapter crimeAdapter = new CrimeAdapter(crimeList);
-        // set the RecyclerView's adapter
-        mCrimeRecyclerView.setAdapter(crimeAdapter);
+        if (mCrimeAdapter == null) {
+            mCrimeAdapter = new CrimeAdapter(crimeList);
+            // set the RecyclerView's adapter
+            mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        }
+        else {
+            mCrimeAdapter.notifyDataSetChanged();
+        }
     }
 }
