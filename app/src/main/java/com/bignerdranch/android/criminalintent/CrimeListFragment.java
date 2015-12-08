@@ -55,10 +55,13 @@ public class CrimeListFragment extends Fragment
 
             //Toast.makeText(getActivity(), mCrimeTitleTextView.getText() + " pressed", Toast.LENGTH_SHORT).show();
             mClickedCrime = mCrime;
-            Intent intent = new Intent(getActivity(), CrimeActivity.class);
-            intent.putExtra(CRIME_ID_KEY, mCrime.getId());
+            //Intent intent = new Intent(getActivity(), CrimeActivity.class);
+            //intent.putExtra(CRIME_ID_KEY, mCrime.getId());
 
-            Log.d(App.LOG_TAG, "starting activity....................");
+            // creating a new Intent to start a CrimePagerActivity for the current crime
+            Log.d(App.LOG_TAG, "CrimeHolder.onClick: getting an intent from CrimePagerActivity for crime ID " + mCrime.getId() + "...");
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
+            Log.d(App.LOG_TAG, "CrimeHolder.onClick: intent " + intent + " received. Starting activity.....");
             startActivity(intent);
         }
     }
